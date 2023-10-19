@@ -1,24 +1,29 @@
 {
-	"name": "demo-application",
-	"version": "0.0.1",
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch"
-	},
-	"devDependencies": {
-		"@fontsource/fira-mono": "^4.5.10",
-		"@neoconfetti/svelte": "^1.0.0",
-		"@sveltejs/adapter-auto": "^2.0.0",
-		"@sveltejs/kit": "^1.20.4",
-		"@types/cookie": "^0.5.1",
-		"firebase": "^10.5.0",
-		"svelte": "^4.0.5",
-		"svelte-check": "^3.4.3",
-		"typescript": "^5.0.0",
-		"vite": "^4.4.2"
-	},
-	"type": "module"
+    "name": "demo-application",
+    "version": "0.0.1",
+    "scripts": {
+        "dev": "vite dev",
+        "build": "vite build",
+        "preview": "vite preview",
+        "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
+        "check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
+        "postinstall": "prisma generate"
+    },
+    "devDependencies": {
+        "@fontsource/fira-mono": "^4.5.10",
+        "@neoconfetti/svelte": "^1.0.0",
+        "@prisma/client": "^5.4.2",
+        "@sveltejs/adapter-auto": "^2.0.0",
+        "@sveltejs/kit": "^1.20.4",
+        "@types/cookie": "^0.5.1",
+        "firebase": "^10.5.0",
+        "svelte": "^4.0.5",
+        "svelte-check": "^3.4.3",
+        "typescript": "^5.0.0",
+        "vite": "^4.4.2",
+        "mysql": "^2.18.1",
+        "mysql2": "^3.6.2",
+        "sequelize": "^6.33.0"
+    },
+    "type": "module"
 }

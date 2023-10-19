@@ -21,6 +21,8 @@
         PUBLIC_APP_ID,
     } from '$env/static/public';
 
+    import { page } from '$app/stores';
+
     const firebaseConfig = {
         apiKey: processEnv.PUBLIC_API_KEY || PUBLIC_API_KEY,
         authDomain: processEnv.PUBLIC_AUTH_DOMAIN || PUBLIC_AUTH_DOMAIN,
@@ -37,7 +39,14 @@
 
     let currentUser = null;
 
-    onAuthStateChanged(auth, (user) => (currentUser = user ?? null));
+    onAuthStateChanged(auth, async (user) => {
+        currentUser = user ?? null;
+
+        if (currentUser) {
+            todos = await get();
+            console.log(todos);
+        }
+    });
 
     export async function openGoogleLogin() {
         const googleAuthProvider = new GoogleAuthProvider();
@@ -65,23 +74,57 @@
     let todos = [];
     let new_todo = '';
 
-    function add(event) {
+    async function add(event) {
         if (
             // Pressing Enter
             (event.type === 'keydown' && event.keyCode === 13) ||
             // mouse click
             event.type === 'click'
         ) {
-            todos = [
-                {
-                    checked: false,
-                    message: new_todo,
-                },
-                ...todos,
-            ];
+            const _todo = {
+                checked: false,
+                todo: new_todo,
+            };
+
+            await save(_todo), (todos = [_todo, ...todos]);
 
             new_todo = '';
         }
+    }
+
+    async function update(data) {
+        const appUrl = $page.url.href;
+        const url = new URL('/api/db/handler', appUrl);
+
+        url.searchParams.append('action', 'upsert');
+        url.searchParams.append('email', currentUser.email);
+        url.searchParams.append('todo', data.todo);
+        url.searchParams.append('checked', !data.checked);
+
+        const response = await fetch(url);
+    }
+
+    async function save(data) {
+        const appUrl = $page.url.href;
+        const url = new URL('/api/db/handler', appUrl);
+
+        url.searchParams.append('action', 'upsert');
+        url.searchParams.append('email', currentUser.email);
+        url.searchParams.append('todo', data.todo);
+
+        const response = await fetch(url);
+    }
+
+    async function get() {
+        const appUrl = $page.url.href;
+        const url = new URL('/api/db/handler', appUrl);
+
+        url.searchParams.append('action', 'get');
+        url.searchParams.append('email', currentUser.email);
+
+        const response = await fetch(url);
+
+        return response.json();
     }
 </script>
 
@@ -125,14 +168,11 @@
                 <div class="todo">
                     <input
                         type="checkbox"
-                        checked="{todo.checked}"
+                        bind:checked="{todo.checked}"
                         id="{index}"
+                        on:change="{update(todo)}"
                     />
-                    <label
-                        for="{index}"
-                        contenteditable
-                        bind:innerText="{todo.message}">{todo.message}</label
-                    >
+                    <label for="{index}">{todo.todo}</label>
                 </div>
             {/each}
         </div>
