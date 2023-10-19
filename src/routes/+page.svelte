@@ -43,8 +43,9 @@
         currentUser = user ?? null;
 
         if (currentUser) {
+            loading = true;
             todos = await get();
-            console.log(todos);
+            loading = false;
         }
     });
 
@@ -73,6 +74,7 @@
 
     let todos = [];
     let new_todo = '';
+    let loading = false;
 
     async function add(event) {
         if (
@@ -86,7 +88,8 @@
                 todo: new_todo,
             };
 
-            await save(_todo), (todos = [_todo, ...todos]);
+            await save(_todo);
+            todos = await get();
 
             new_todo = '';
         }
@@ -124,7 +127,13 @@
 
         const response = await fetch(url);
 
-        return response.json();
+        try {
+            return response.json();
+        } catch (error) {
+            console.log(error);
+
+            return {};
+        }
     }
 </script>
 
@@ -139,6 +148,36 @@
             Hi {currentUser.displayName}
             <button on:click="{appSignOut}">Sign-out</button>
         </section>
+
+        <section class="input-section">
+            <input
+                bind:value="{new_todo}"
+                type="text"
+                placeholder="Add your TODO here"
+                on:keydown="{add}"
+            />
+            <button on:click="{add}">Add!</button>
+        </section>
+
+        {#if loading}
+            Loading......
+        {:else if todos.length === 0}
+            <section>No todos? Well, a bit lazy aren't we?</section>
+        {:else}
+            <div class="todo-list">
+                {#each todos as todo, index}
+                    <div class="todo">
+                        <input
+                            type="checkbox"
+                            bind:checked="{todo.checked}"
+                            id="{index}"
+                            on:change="{update(todo)}"
+                        />
+                        <label for="{index}">{todo.todo}</label>
+                    </div>
+                {/each}
+            </div>
+        {/if}
     {:else}
         <section>
             <button
@@ -149,33 +188,6 @@
                 <span class="sign-in">Sign in with Google</span>
             </button>
         </section>
-    {/if}
-    <section class="input-section">
-        <input
-            bind:value="{new_todo}"
-            type="text"
-            placeholder="Add your TODO here"
-            on:keydown="{add}"
-        />
-        <button on:click="{add}">Add!</button>
-    </section>
-
-    {#if todos.length === 0}
-        <section>No todos? Well, a bit lazy aren't we?</section>
-    {:else}
-        <div class="todo-list">
-            {#each todos as todo, index}
-                <div class="todo">
-                    <input
-                        type="checkbox"
-                        bind:checked="{todo.checked}"
-                        id="{index}"
-                        on:change="{update(todo)}"
-                    />
-                    <label for="{index}">{todo.todo}</label>
-                </div>
-            {/each}
-        </div>
     {/if}
 </div>
 

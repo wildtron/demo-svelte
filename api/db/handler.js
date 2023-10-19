@@ -47,14 +47,6 @@ const handlers = {
     },
 };
 
-try {
-    await sequelize.authenticate();
-    console.log('Connection has been established successfully.');
-} catch (error) {
-    console.error('Unable to connect to the database:', error);
-    return response.status(400);
-}
-
 export default async function handler(request, response) {
     if (!request.url) {
         return response.status(400);
