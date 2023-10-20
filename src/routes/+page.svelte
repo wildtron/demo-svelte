@@ -145,7 +145,7 @@
 <div class="container">
     {#if currentUser}
         <section>
-            Hi {currentUser.displayName}
+            Hi {currentUser.displayName}!  Add list now!
             <button on:click="{appSignOut}">Sign-out</button>
         </section>
 
